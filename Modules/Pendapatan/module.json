@@ -1,0 +1,13 @@
+{
+    "name": "Pendapatan",
+    "alias": "pendapatan",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Pendapatan\\Providers\\PendapatanServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}
