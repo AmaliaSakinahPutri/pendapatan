@@ -53,8 +53,8 @@
                                 <td>Rp{{ number_format($item->total_potongan, 0, ',', '.') }}</td>
                                 <td>Rp{{ number_format($item->total_netto, 0, ',', '.') }}</td>
                                 <td>
-                                    <a href="{{ route('pendapatan.detail_pertahun', [$item->pegawai_id, $item->tahun]) }}" class="btn btn-sm btn-info">Detail</a>
-                                    <a href="{{ route('pendapatan.cetak.tahun', [$item->pegawai_id, $item->tahun]) }}" class="btn btn-sm btn-secondary" target="_blank">Cetak</a>
+                                    <a href="{{ route('pendapatan.detail_pertahun', [$item->pegawai_id, $item->tahun]) }}" class="btn btn-sm btn-primary">Detail</a>
+                                    <a href="{{ route('pendapatan.cetak.tahun', [$item->pegawai_id, $item->tahun]) }}" class="btn btn-sm btn-danger" target="_blank">Cetak</a>
                                 </td>
                             </tr>
                         @endforeach

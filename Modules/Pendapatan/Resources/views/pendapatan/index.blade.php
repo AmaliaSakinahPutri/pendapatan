@@ -73,8 +73,8 @@
                                 <td>Rp{{ number_format($item->total_potongan, 0, ',', '.') }}</td>
                                 <td>Rp{{ number_format($item->total_netto, 0, ',', '.') }}</td>
                                 <td>
-                                    <a href="{{ route('pendapatan.detail', [$item->pegawai_id, \Carbon\Carbon::parse($item->bulan)->format('m'), $item->tahun]) }}" class="btn btn-sm btn-info">Detail</a>
-                                    <a href="{{ route('pendapatan.cetak.bulan', [$item->pegawai_id, \Carbon\Carbon::parse($item->bulan)->format('m'), $item->tahun]) }}" class="btn btn-sm btn-secondary" target="_blank">Cetak</a>
+                                    <a href="{{ route('pendapatan.detail', [$item->pegawai_id, \Carbon\Carbon::parse($item->bulan)->format('m'), $item->tahun]) }}" class="btn btn-sm btn-primary">Detail</a>
+                                    <a href="{{ route('pendapatan.cetak.bulan', [$item->pegawai_id, \Carbon\Carbon::parse($item->bulan)->format('m'), $item->tahun]) }}" class="btn btn-sm btn-danger" target="_blank">Cetak</a>
                                 </td>
                             </tr>
                         @endforeach
