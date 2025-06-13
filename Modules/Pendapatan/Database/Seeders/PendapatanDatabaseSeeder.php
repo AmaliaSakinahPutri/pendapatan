@@ -25,49 +25,36 @@ class PendapatanDatabaseSeeder extends Seeder
         Menu::where('modul', 'Pendapatan Keuangan')->delete();
 
         // === Pendapatan untuk Pegawai ===
-        $menuPegawai = Menu::create([
-            'modul'     => 'Pendapatan Pegawai',
-            'label'     => 'Pendapatan',
-            'url'       => 'pendapatan/dashboard',
-            'can'       => serialize(['pegawai']),
-            'icon'      => 'fas fa-dollar-sign',
-            'urut'      => 4,
-            'parent_id' => 0,
-            'active'    => serialize(['pendapatan/dashboard']),
-        ]);
-
-        if ($menuPegawai) {
-            Menu::create([
+         Menu::create([
                 'modul'     => 'Pendapatan Pegawai',
                 'label'     => 'Dashboard',
                 'url'       => 'pendapatan/dashboard',
                 'can'       => serialize(['pegawai']),
                 'icon'      => 'fas fa-tachometer-alt',
-                'urut'      => 1,
-                'parent_id' => $menuPegawai->id,
+                'urut'      => 3,
+                'parent_id' => 0,
                 'active'    => serialize(['pendapatan/dashboard*']),
             ]);
             Menu::create([
                 'modul'     => 'Pendapatan Pegawai',
                 'label'     => 'Per Bulan',
-                'url'       => 'pendapatan/perbulan',
+                'url'       => 'pendapatan/pegawai_perbulan',
                 'can'       => serialize(['pegawai']),
                 'icon'      => 'fas fa-calendar-alt',
                 'urut'      => 2,
-                'parent_id' => $menuPegawai->id,
-                'active'    => serialize(['pendapatan/perbulan*']),
+                'parent_id' => 0,
+                'active'    => serialize(['pendapatan/pegawai_perbulan*']),
             ]);
             Menu::create([
                 'modul'     => 'Pendapatan Pegawai',
                 'label'     => 'Per Tahun',
-                'url'       => 'pendapatan/pertahun',
+                'url'       => 'pendapatan/pegawai_pertahun',
                 'can'       => serialize(['pegawai']),
                 'icon'      => 'fas fa-calendar',
-                'urut'      => 3,
-                'parent_id' => $menuPegawai->id,
-                'active'    => serialize(['pendapatan/pertahun*']),
+                'urut'      => 2,
+                'parent_id' => 0,
+                'active'    => serialize(['pendapatan/pegawai_pertahun*']),
             ]);
-        }
 
         // === Pendapatan untuk Keuangan ===
         $menuKeuangan = Menu::create([
@@ -80,49 +67,46 @@ class PendapatanDatabaseSeeder extends Seeder
             'parent_id' => 0,
             'active'    => serialize(['pendapatan/index']),
         ]);
-
-        if ($menuKeuangan) {
-            Menu::create([
-                'modul'     => 'Pendapatan Keuangan',
-                'label'     => 'Dashboard',
-                'url'       => 'pendapatan/dashboard',
-                'can'       => serialize(['keuangan']),
-                'icon'      => 'fas fa-tachometer-alt',
-                'urut'      => 1,
-                'parent_id' => $menuKeuangan->id,
-                'active'    => serialize(['pendapatan/dashboard*']),
-            ]);
-            Menu::create([
-                'modul'     => 'Pendapatan Keuangan',
-                'label'     => 'Per Bulan',
-                'url'       => 'pendapatan/perbulan',
-                'can'       => serialize(['keuangan']),
-                'icon'      => 'fas fa-calendar-alt',
-                'urut'      => 2,
-                'parent_id' => $menuKeuangan->id,
-                'active'    => serialize(['pendapatan/perbulan*']),
-            ]);
-            Menu::create([
-                'modul'     => 'Pendapatan Keuangan',
-                'label'     => 'Per Tahun',
-                'url'       => 'pendapatan/pertahun',
-                'can'       => serialize(['keuangan']),
-                'icon'      => 'fas fa-calendar',
-                'urut'      => 3,
-                'parent_id' => $menuKeuangan->id,
-                'active'    => serialize(['pendapatan/pertahun*']),
-            ]);
-            Menu::create([
-                'modul'     => 'Pendapatan Keuangan',
-                'label'     => 'Pendapatan',
-                'url'       => 'pendapatan/index',
-                'can'       => serialize(['keuangan']),
-                'icon'      => 'fas fa-file-invoice-dollar',
-                'urut'      => 4,
-                'parent_id' => $menuKeuangan->id,
-                'active'    => serialize(['pendapatan/index*']),
-            ]);
-        }
+        Menu::create([
+            'modul'     => 'Pendapatan Keuangan',
+            'label'     => 'Dashboard',
+            'url'       => 'pendapatan/dashboard',
+            'can'       => serialize(['keuangan']),
+            'icon'      => 'fas fa-tachometer-alt',
+            'urut'      => 4,
+            'parent_id' => 0,
+            'active'    => serialize(['pendapatan/dashboard*']),
+        ]);
+        Menu::create([
+            'modul'     => 'Pendapatan Keuangan',
+            'label'     => 'Per Bulan',
+            'url'       => 'pendapatan/perbulan',
+            'can'       => serialize(['keuangan']),
+            'icon'      => 'fas fa-calendar-alt',
+            'urut'      => 2,
+            'parent_id' => 0,
+            'active'    => serialize(['pendapatan/perbulan*']),
+        ]);
+        Menu::create([
+            'modul'     => 'Pendapatan Keuangan',
+            'label'     => 'Per Tahun',
+            'url'       => 'pendapatan/pertahun',
+            'can'       => serialize(['keuangan']),
+            'icon'      => 'fas fa-calendar',
+            'urut'      => 1,
+            'parent_id' => 0,
+            'active'    => serialize(['pendapatan/pertahun*']),
+        ]);
+        Menu::create([
+            'modul'     => 'Pendapatan Keuangan',
+            'label'     => 'Pendapatan',
+            'url'       => 'pendapatan/index',
+            'can'       => serialize(['keuangan']),
+            'icon'      => 'fas fa-file-invoice-dollar',
+            'urut'      => 3,
+            'parent_id' => 0,
+            'active'    => serialize(['pendapatan/index*']),
+        ]);
 
        
     }
