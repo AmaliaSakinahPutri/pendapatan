@@ -108,6 +108,42 @@ class PendapatanDatabaseSeeder extends Seeder
             'active'    => serialize(['pendapatan/index*']),
         ]);
 
+        // Buat role pegawai dan keuangan jika belum ada
+        $rolePegawai  = Role::firstOrCreate(['name' => 'pegawai']);
+        $roleKeuangan = Role::firstOrCreate(['name' => 'keuangan']);
+
+        // Daftar permission sesuai route
+        $permissions = [
+            'pendapatan.dashboard',
+            'pendapatan.index',
+            'pendapatan.create',
+            'pendapatan.store',
+            'pendapatan.edit',
+            'pendapatan.update',
+            'pendapatan.destroy',
+            'pendapatan.import',
+            'pendapatan.perbulan',
+            'pendapatan.pertahun',
+            'pendapatan.detail',
+            'pendapatan.detail_pertahun',
+            'pendapatan.cetak.bulan',
+            'pendapatan.cetak.tahun',
+            'logout.perform',
+            'login.show',
+            'login.perform',
+            'home.index',
+            'adminlte.darkmode.toggle',
+        ];
+
+        // Buat permission jika belum ada
+        foreach ($permissions as $permission) {
+            Permission::firstOrCreate(['name' => $permission]);
+        }
+
+        // Sinkronisasi permission ke role pegawai dan keuangan
+        $rolePegawai->syncPermissions($permissions);
+        $roleKeuangan->syncPermissions($permissions);
+
        
     }
 }
