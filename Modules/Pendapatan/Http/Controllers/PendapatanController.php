@@ -90,8 +90,17 @@ class PendapatanController extends Controller
                 SUM(pendapatan.potongan) as total_potongan,
                 SUM(pendapatan.nilai_netto) as total_netto
             ')
+            ->where(function($query) use ($import) {
+                foreach ($import->inserted as $data) {
+                    $query->orWhere(function ($q) use ($data) {
+                        $q->where('pendapatan.pegawai_id', $data['pegawai_id'])
+                        ->whereRaw('DATE_FORMAT(pendapatan.bulan, "%Y-%m") = ?', [$data['bulan']]);
+                    });
+                }
+            })
             ->groupBy('pendapatan.pegawai_id', 'pegawais.nama', 'pegawais.no_tlp', DB::raw('DATE_FORMAT(pendapatan.bulan, "%Y-%m")'), DB::raw('YEAR(pendapatan.bulan)'))
             ->get();
+
 
         foreach ($pendapatan as $item) {
             //memvalidasi apakah no hp ada

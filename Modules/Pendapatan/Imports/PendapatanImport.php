@@ -127,8 +127,13 @@ class PendapatanImport implements ToModel, SkipsOnFailure, WithHeadingRow
             ->first();
 
         if ($existing) {
-            return $existing; // Jangan buat baru, return yang lama
+            return null; // Jangan buat baru, return yang lama
         }
+
+        $this->inserted[] = [
+            'pegawai_id' => $pegawai->id,
+            'bulan'      => $tanggal->format('Y-m'), // disamakan dengan yang di query
+        ];
 
         //membuat data pendapatan baru
         return new Pendapatan([
@@ -142,6 +147,9 @@ class PendapatanImport implements ToModel, SkipsOnFailure, WithHeadingRow
             'potongan'      => $potongan,
             'nilai_netto'   => $nilaiBruto - $pajak - $potongan,
         ]);
+
+        
+
 
     }
 }
