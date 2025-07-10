@@ -13,8 +13,10 @@ class FilterController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    //fungsi filter perbulan
     public function perbulan(Request $request)
     {
+        //mengambil data pendapatan perbulan
         $query = DB::table('pendapatan')
             ->join('pegawais', 'pendapatan.pegawai_id', '=', 'pegawais.id')
             ->selectRaw('
@@ -56,8 +58,10 @@ class FilterController extends Controller
         return view('pendapatan::perbulan.index', compact('pendapatan'));
     }
 
+    //filter pendapatan pertahun
     public function pertahun(Request $request)
     {
+        //mengambil data pendapatan pertahun
         $query = DB::table('pendapatan')
             ->join('pegawais', 'pendapatan.pegawai_id', '=', 'pegawais.id')
             ->selectRaw('

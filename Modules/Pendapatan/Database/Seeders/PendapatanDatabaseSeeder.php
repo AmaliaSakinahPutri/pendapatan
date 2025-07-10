@@ -24,59 +24,74 @@ class PendapatanDatabaseSeeder extends Seeder
         Menu::where('modul', 'Pendapatan Pegawai')->delete();
         Menu::where('modul', 'Pendapatan Keuangan')->delete();
 
-        // === Pendapatan untuk Pegawai ===
-         Menu::create([
-                'modul'     => 'Pendapatan Pegawai',
-                'label'     => 'Dashboard',
-                'url'       => 'pendapatan/dashboard',
-                'can'       => serialize(['pegawai']),
-                'icon'      => 'fas fa-tachometer-alt',
-                'urut'      => 3,
-                'parent_id' => 0,
-                'active'    => serialize(['pendapatan/dashboard*']),
-            ]);
-            Menu::create([
-                'modul'     => 'Pendapatan Pegawai',
-                'label'     => 'Per Bulan',
-                'url'       => 'pendapatan/pegawai_perbulan',
-                'can'       => serialize(['pegawai']),
-                'icon'      => 'fas fa-calendar-alt',
-                'urut'      => 2,
-                'parent_id' => 0,
-                'active'    => serialize(['pendapatan/pegawai_perbulan*']),
-            ]);
-            Menu::create([
-                'modul'     => 'Pendapatan Pegawai',
-                'label'     => 'Per Tahun',
-                'url'       => 'pendapatan/pegawai_pertahun',
-                'can'       => serialize(['pegawai']),
-                'icon'      => 'fas fa-calendar',
-                'urut'      => 2,
-                'parent_id' => 0,
-                'active'    => serialize(['pendapatan/pegawai_pertahun*']),
-            ]);
+        // === Dropdown: Pendapatan Pegawai ===
+        $menuPegawai = Menu::create([
+            'modul'     => 'Pendapatan Pegawai',
+            'label'     => 'Pendapatan Pegawai',
+            'url'       => '#',
+            'can'       => serialize(['pegawai']),
+            'icon'      => 'fas fa-money-bill-wave',
+            'urut'      => 3,
+            'parent_id' => 0,
+            'active'    => serialize([]),
+        ]);
 
-        // === Pendapatan untuk Keuangan ===
+        Menu::create([
+            'modul'     => 'Pendapatan Pegawai',
+            'label'     => 'Dashboard',
+            'url'       => 'pendapatan/dashboard',
+            'can'       => serialize(['pegawai']),
+            'icon'      => 'fas fa-tachometer-alt',
+            'urut'      => 1,
+            'parent_id' => $menuPegawai->id,
+            'active'    => serialize(['pendapatan/dashboard*']),
+        ]);
+
+        Menu::create([
+            'modul'     => 'Pendapatan Pegawai',
+            'label'     => 'Per Bulan',
+            'url'       => 'pendapatan/pegawai_perbulan',
+            'can'       => serialize(['pegawai']),
+            'icon'      => 'fas fa-calendar-alt',
+            'urut'      => 2,
+            'parent_id' => $menuPegawai->id,
+            'active'    => serialize(['pendapatan/pegawai_perbulan*']),
+        ]);
+
+        Menu::create([
+            'modul'     => 'Pendapatan Pegawai',
+            'label'     => 'Per Tahun',
+            'url'       => 'pendapatan/pegawai_pertahun',
+            'can'       => serialize(['pegawai']),
+            'icon'      => 'fas fa-calendar',
+            'urut'      => 3,
+            'parent_id' => $menuPegawai->id,
+            'active'    => serialize(['pendapatan/pegawai_pertahun*']),
+        ]);
+
+        // === Dropdown: Pendapatan Keuangan ===
         $menuKeuangan = Menu::create([
             'modul'     => 'Pendapatan Keuangan',
-            'label'     => 'Pendapatan',
-            'url'       => 'pendapatan/index',
+            'label'     => 'Pendapatan Keuangan',
+            'url'       => '#',
             'can'       => serialize(['keuangan']),
             'icon'      => 'fas fa-dollar-sign',
             'urut'      => 5,
             'parent_id' => 0,
-            'active'    => serialize(['pendapatan/index']),
+            'active'    => serialize([]),
         ]);
+
         Menu::create([
             'modul'     => 'Pendapatan Keuangan',
             'label'     => 'Dashboard',
             'url'       => 'pendapatan/dashboard',
             'can'       => serialize(['keuangan']),
             'icon'      => 'fas fa-tachometer-alt',
-            'urut'      => 4,
-            'parent_id' => 0,
+            'urut'      => 1,
+            'parent_id' => $menuKeuangan->id,
             'active'    => serialize(['pendapatan/dashboard*']),
         ]);
+
         Menu::create([
             'modul'     => 'Pendapatan Keuangan',
             'label'     => 'Per Bulan',
@@ -84,29 +99,32 @@ class PendapatanDatabaseSeeder extends Seeder
             'can'       => serialize(['keuangan']),
             'icon'      => 'fas fa-calendar-alt',
             'urut'      => 2,
-            'parent_id' => 0,
+            'parent_id' => $menuKeuangan->id,
             'active'    => serialize(['pendapatan/perbulan*']),
         ]);
+
         Menu::create([
             'modul'     => 'Pendapatan Keuangan',
             'label'     => 'Per Tahun',
             'url'       => 'pendapatan/pertahun',
             'can'       => serialize(['keuangan']),
             'icon'      => 'fas fa-calendar',
-            'urut'      => 1,
-            'parent_id' => 0,
+            'urut'      => 3,
+            'parent_id' => $menuKeuangan->id,
             'active'    => serialize(['pendapatan/pertahun*']),
         ]);
+
         Menu::create([
             'modul'     => 'Pendapatan Keuangan',
             'label'     => 'Pendapatan',
             'url'       => 'pendapatan/index',
             'can'       => serialize(['keuangan']),
             'icon'      => 'fas fa-file-invoice-dollar',
-            'urut'      => 3,
-            'parent_id' => 0,
+            'urut'      => 4,
+            'parent_id' => $menuKeuangan->id,
             'active'    => serialize(['pendapatan/index*']),
         ]);
+
 
         // Buat role pegawai dan keuangan jika belum ada
         $rolePegawai  = Role::firstOrCreate(['name' => 'pegawai']);

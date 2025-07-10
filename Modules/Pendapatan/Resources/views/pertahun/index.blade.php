@@ -76,15 +76,17 @@
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css"/>
-
+@if($pendapatan->isEmpty())
+@else
 <script>
     $(document).ready(function () {
         $('#pendapatan-table').DataTable({
             responsive: true,
             language: {
-                url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/id.json'
+                url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/id.json'
             }
         });
     });
 </script>
+@endif
 @endsection

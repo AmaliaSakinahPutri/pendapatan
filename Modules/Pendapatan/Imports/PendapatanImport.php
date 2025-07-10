@@ -18,8 +18,10 @@ class PendapatanImport implements ToModel, SkipsOnFailure, WithHeadingRow
 
     public function model(array $row)
     {
+        //mengecek apakah nip ada di tabel pegawai sebelum excel di masukan ke database
         $pegawai = Pegawai::where('nip', $row['nip'])->first();
 
+        //jika tidak ada nip maka mengirimkan pesan error
         if (! $pegawai) {
             $this->errors[] = [
                 'nama'  => $row['nip'],
@@ -29,6 +31,7 @@ class PendapatanImport implements ToModel, SkipsOnFailure, WithHeadingRow
             return null;
         }
 
+        //jika jenis pendapatan kosong maka kirimkan error
         if (empty($row['jenis_pendapatan'])) {
             $this->errors[] = [
                 'nama'  => $pegawai->nama,
@@ -40,6 +43,7 @@ class PendapatanImport implements ToModel, SkipsOnFailure, WithHeadingRow
 
         $jenisPendapatan = trim($row['jenis_pendapatan'] ?? '');
 
+        //jika nama jenis pendapatan belum ada di database makan buat nama jenis pendapatan
         $jenis = JenisPendapatan::firstOrCreate([
             'nama_jenis_pendapatan' => $jenisPendapatan,
         ]);
@@ -82,6 +86,7 @@ class PendapatanImport implements ToModel, SkipsOnFailure, WithHeadingRow
             ];
         }
 
+        //jika pajak kosong atau bukan 0 maka kirim kan error
         if (is_null($pajak)) {
             $this->errors[] = [
                 'nama'  => $pegawai->nama,
@@ -90,6 +95,7 @@ class PendapatanImport implements ToModel, SkipsOnFailure, WithHeadingRow
             ];
         }
 
+         //jika potongan kosong atau bukan 0 maka kirim kan error
         if (is_null($potongan)) {
             $this->errors[] = [
                 'nama'  => $pegawai->nama,
@@ -109,6 +115,7 @@ class PendapatanImport implements ToModel, SkipsOnFailure, WithHeadingRow
             }
         }
 
+        //buat semua nilai menjadi angka
         $nilaiBruto = is_numeric($row['bruto']) ? $row['bruto'] : 0;
         $pajak      = is_numeric($row['pajak']) ? $row['pajak'] : 0;
         $potongan   = is_numeric($row['potongan']) ? $row['potongan'] : 0;
@@ -123,6 +130,7 @@ class PendapatanImport implements ToModel, SkipsOnFailure, WithHeadingRow
             return $existing; // Jangan buat baru, return yang lama
         }
 
+        //membuat data pendapatan baru
         return new Pendapatan([
             'pegawai_id'    => $pegawai->id,
             'jenis_id'      => $jenis->id,

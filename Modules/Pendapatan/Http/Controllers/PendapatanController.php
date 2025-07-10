@@ -14,8 +14,10 @@ use Modules\Pendapatan\Imports\PendapatanImport;
 
 class PendapatanController extends Controller
 {
+    //fungsi cetak pendapatan perbulan
     public function cetakbulan($pegawai_id, $bulan, $tahun)
     {
+        //mengambil data pendapatan sesuai pegawai dan perbulan
         $pendapatan = Pendapatan::with('jenisPendapatan')
             ->where('pegawai_id', $pegawai_id)
             ->whereMonth('bulan', $bulan)
@@ -31,12 +33,16 @@ class PendapatanController extends Controller
             return redirect()->back()->with('error', 'Data pendapatan tidak ditemukan.');
         }
 
+        //data pendapatan dibuat pdf
         $pdf = Pdf::loadView('pendapatan::pendapatan.cetak', compact('pendapatan', 'pegawai', 'bulan', 'tahun'));
 
         return $pdf->stream('laporan-pendapatan-' . $pegawai->nama . '-' . $bulan . '-' . $tahun . '.pdf');
     }
+
+    //mengambil data pendapatan sesuai pegawai dan pertahun
     public function cetaktahun($pegawai_id, $tahun)
     {
+        //mengambil data pendapatan sesuai pegawai dan pertahun
         $pendapatan = Pendapatan::where('pegawai_id', $pegawai_id)
             ->where('tahun', $tahun)
             ->get();
@@ -51,20 +57,26 @@ class PendapatanController extends Controller
             return redirect()->back()->with('error', 'Data pendapatan tidak ditemukan.');
         }
 
+        //data pendapatan dibuat pdf
         $pdf = Pdf::loadView('pendapatan::pendapatan.cetak_tahun', compact('pendapatan', 'pegawai', 'tahun'));
 
         return $pdf->stream('laporan-pendapatan-' . $pegawai->nama . '-' . $tahun . '.pdf');
     }
 
+    //fungsi import excel
     public function importExcel(Request $request)
     {
+        //validasi file apakah berupa excel atau bukan
         $request->validate([
             'file' => 'required|mimes:xlsx,xls,csv',
         ]);
 
+        //membuat importan
         $import = new PendapatanImport();
+        //memasukan impotan excel ke database
         Excel::import($import, $request->file('file'));
 
+        // mengambil data pendapatan yang sudah dimasukan untuk dibuat pesan
         $pendapatan = DB::table('pendapatan')
             ->join('pegawais', 'pendapatan.pegawai_id', '=', 'pegawais.id')
             ->selectRaw('
@@ -82,7 +94,9 @@ class PendapatanController extends Controller
             ->get();
 
         foreach ($pendapatan as $item) {
+            //memvalidasi apakah no hp ada
             if (! empty($item->no_tlp)) {
+                //membuat pesan whatsapp
                 $message = "Rincian Gaji Anda Bulan {$item->bulan}:\n"
                 . "Nama: {$item->nama}\n"
                 . "Total Bruto: Rp" . number_format($item->total_bruto, 0, ',', '.') . "\n"
@@ -95,6 +109,8 @@ class PendapatanController extends Controller
                     'message'      => $message,
                 ]);
 
+                //mengirim pesan melalui api poliwangi
+                $token = getenv('SIT_API_TOKEN');
                 $curl = curl_init();
                 curl_setopt_array($curl, [
                     CURLOPT_URL            => 'https://sit.poliwangi.ac.id/v2/api/v1/sitapi/wa',
@@ -103,6 +119,7 @@ class PendapatanController extends Controller
                     CURLOPT_POSTFIELDS     => $payload,
                     CURLOPT_HTTPHEADER     => [
                         'Content-Type: application/json',
+                        'Authorization: Bearer ' . $token,
                     ],
                 ]);
 
@@ -129,6 +146,7 @@ class PendapatanController extends Controller
     // Menampilkan semua data pendapatan
     public function index()
     {
+        //mengamildata dari tabel pendapatan 
         $pendapatan = DB::table('pendapatan')
             ->join('pegawais', 'pendapatan.pegawai_id', '=', 'pegawais.id')
             ->selectRaw('
@@ -182,6 +200,7 @@ class PendapatanController extends Controller
                 ->withErrors(['potongan' => 'Potongan tidak boleh lebih besar dari nilai bruto.']);
         }
 
+        //validasi data sudah sesuai dengan format yang diminta database
         $request->validate([
             'pegawai_id'    => 'required|exists:pegawai,id',
             'jenis_id'      => 'required|exists:jenis_pendapatan,id',
@@ -229,51 +248,57 @@ class PendapatanController extends Controller
             ->exists();
 
         if ($exists) {
-            return redirect()->back()
-                ->withInput()
-                ->withErrors(['duplicate' => 'Data pendapatan untuk kombinasi pegawai, jenis, bulan, dan tahun ini sudah ada.']);
-        }
+            return redirect()->back()->withInput()->withErrors(['duplicate' => 'Data pendapatan untuk kombinasi pegawai, jenis, bulan, dan tahun ini sudah ada.']);
+        }else{
+            //membuat pemdapatan
+            Pendapatan::create($data);
 
-        Pendapatan::create($data);
+            // Ambil data pegawai
+            $pegawai = Pegawai::find($request->pegawai_id);
 
-        // Ambil data pegawai
-        $pegawai = Pegawai::find($request->pegawai_id);
+            // Kirim WhatsApp jika nomor ada
+            if ($pegawai && ! empty($pegawai->no_tlp)) {
+                $bulan   = date('Y-m', strtotime($data['bulan']));
 
-        // Kirim WhatsApp jika nomor ada
-        if ($pegawai && ! empty($pegawai->no_tlp)) {
-            $bulan   = date('Y-m', strtotime($data['bulan']));
-            $message = "Rincian Gaji Anda Bulan {$bulan}:\n"
-            . "Nama: {$pegawai->nama}\n"
-            . "Jenis: " . JenisPendapatan::find($request->jenis_id)->nama_jenis_pendapatan . "\n"
-            . "Total Bruto: Rp" . number_format($bruto, 0, ',', '.') . "\n"
-            . "Pajak: Rp" . number_format($pajak, 0, ',', '.') . "\n"
-            . "Potongan: Rp" . number_format($potongan, 0, ',', '.') . "\n"
-            . "Total Netto: Rp" . number_format($request->nilai_netto, 0, ',', '.');
+                //membuat pesan whatsapp
+                $message = "Rincian Gaji Anda Bulan {$bulan}:\n"
+                . "Nama: {$pegawai->nama}\n"
+                . "Jenis: " . JenisPendapatan::find($request->jenis_id)->nama_jenis_pendapatan . "\n"
+                . "Total Bruto: Rp" . number_format($bruto, 0, ',', '.') . "\n"
+                . "Pajak: Rp" . number_format($pajak, 0, ',', '.') . "\n"
+                . "Potongan: Rp" . number_format($potongan, 0, ',', '.') . "\n"
+                . "Total Netto: Rp" . number_format($request->nilai_netto, 0, ',', '.');
 
-            $payload = json_encode([
-                'phone_number' => $pegawai->no_tlp,
-                'message'      => $message,
-            ]);
+                $payload = json_encode([
+                    'phone_number' => $pegawai->no_tlp,
+                    'message'      => $message,
+                ]);
 
-            $curl = curl_init();
-            curl_setopt_array($curl, [
-                CURLOPT_URL            => 'https://sit.poliwangi.ac.id/v2/api/v1/sitapi/wa',
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_CUSTOMREQUEST  => 'POST',
-                CURLOPT_POSTFIELDS     => $payload,
-                CURLOPT_HTTPHEADER     => [
-                    'Content-Type: application/json',
-                ],
-            ]);
+                //mengirim wa lewat apinya poliwangi
+                $token = getenv('SIT_API_TOKEN');
+                $curl = curl_init();
+                curl_setopt_array($curl, [
+                    CURLOPT_URL            => 'https://sit.poliwangi.ac.id/v2/api/v1/sitapi/wa',
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_CUSTOMREQUEST  => 'POST',
+                    CURLOPT_POSTFIELDS     => $payload,
+                    CURLOPT_HTTPHEADER     => [
+                        'Content-Type: application/json',
+                        'Authorization: Bearer ' . $token,
+                    ],
+                ]);
 
-            $response = curl_exec($curl);
-            if (curl_errno($curl)) {
-                Log::error('WA API Error: ' . curl_error($curl));
+                $response = curl_exec($curl);
+                if (curl_errno($curl)) {
+                    Log::error('WA API Error: ' . curl_error($curl));
+                }
+                curl_close($curl);
+
+                Log::info('WA API Response: ' . $response);
             }
-            curl_close($curl);
-
-            Log::info('WA API Response: ' . $response);
         }
+
+        
 
         return redirect()->route('pendapatan::pendapatan.index')->with('success', 'Pendapatan berhasil ditambahkan.');
     }
@@ -309,6 +334,7 @@ class PendapatanController extends Controller
                 ->withErrors(['potongan' => 'Potongan tidak boleh lebih besar dari nilai bruto.']);
         }
 
+        //valisdasi data yang diminta sesuai dengan database
         $request->validate([
             'pegawai_id'    => 'required|exists:pegawais,id',
             'jenis_id'      => 'required|exists:jenis_pendapatan,id',
@@ -351,8 +377,10 @@ class PendapatanController extends Controller
         return redirect()->route('pendapatan.index')->with('success', 'Pendapatan berhasil diperbarui.');
     }
 
+    //fungsi untuk menampilkan detail
     public function detail($pegawai_id, $bulan, $tahun)
     {
+        //mengambil data detail dari pendapatan
         $pendapatan = Pendapatan::with('jenisPendapatan')
             ->where('pegawai_id', $pegawai_id)
             ->whereMonth('bulan', $bulan)
@@ -362,8 +390,10 @@ class PendapatanController extends Controller
         return view('pendapatan::pendapatan.detail', compact('pendapatan'));
     }
 
+    //fungsi untuk menampilkan detail pertahun
     public function detailPertahun($pegawai_id, $tahun)
     {
+        //mengambil data detail dari pendapatan
         $pendapatan = Pendapatan::with('jenisPendapatan')
             ->where('pegawai_id', $pegawai_id)
             ->where('tahun', $tahun)

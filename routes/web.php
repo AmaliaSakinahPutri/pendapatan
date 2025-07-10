@@ -18,7 +18,8 @@ Route::group(['namespace' => 'App\Http\Controllers\Core'], function()
 { 
 	Route::group(['middleware' => ['guest']], function() {
 		Route::get('/', function () {
-			return redirect()->route('home.index');//return view('welcome');
+			// return redirect()->route('home.index');
+            return view('welcome');
 		});        
 	});
 	
@@ -26,7 +27,9 @@ Route::group(['namespace' => 'App\Http\Controllers\Core'], function()
 		/**
 		 * Home Routes
 		 */
-		Route::get('/home', 'HomeController@index')->name('home.index');
+		Route::get('/home', function () {
+			return redirect()->route('pendapatan.dashboard');//return view('welcome');
+		});
 		
 		/**
          * User Routes

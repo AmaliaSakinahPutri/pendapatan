@@ -13,13 +13,15 @@ class DashboardController extends Controller
      * Display a listing of the resource.
      * @return Renderable
      */
+    //fungsi untuk menampilkan data pada grafik
     public function index()
     {
+        //mengautentikasi apakah user tersebut memiliki role aktif
         if (isset(auth()->user()->role_aktif) && ! empty(auth()->user()->role_aktif)) {
                 $view = 'pendapatan::dashboard.' . auth()->user()->role_aktif;
 
                 // if (View::exists($view)) {
-                    // Jika role keuangan, kirim data grafik
+                    // Jika role keuangan, kirim data grafik semua pegawai
                     if (auth()->user()->role_aktif == 'keuangan') {
                         $data = Pendapatan::selectRaw('DATE_FORMAT(bulan, "%Y-%m") as bulan, SUM(nilai_netto) as total')
                             ->groupByRaw('DATE_FORMAT(bulan, "%Y-%m")')
@@ -31,7 +33,7 @@ class DashboardController extends Controller
 
                         return view($view, compact('labels', 'totals'));
                     }
-                    // Jika role pegawai, kirim data grafik
+                    // Jika role pegawai, kirim data grafik pegawai itu saja
                     if (auth()->user()->role_aktif == 'pegawai') {
                         $user = Pegawai::where('nip', auth()->user()->nip)->first();
                         $data = Pendapatan::selectRaw('DATE_FORMAT(bulan, "%Y-%m") as bulan, SUM(nilai_netto) as total')
@@ -46,7 +48,7 @@ class DashboardController extends Controller
                         return view($view, compact('labels', 'totals'));
                     }
 
-                    return view($view);
+                    return view('home');
                 // }
             }
 

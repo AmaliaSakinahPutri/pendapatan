@@ -239,13 +239,13 @@ return [
 		
         //['header' => 'account_settings'],
         //['header' => 'Menu'],
-        [
-            'key' => 'dasbor',
-            'text' => 'Dasbor',
-            'url'  => 'home',
-            'icon' => 'nav-icon fas fa-tachometer-alt',
-			'active' => ['home', 'home*'],
-        ],
+        // [
+        //     'key' => 'dashboard',
+        //     'text' => 'Dashboard',
+        //     'url'  => 'dashboard',
+        //     'icon' => 'nav-icon fas fa-tachometer-alt',
+		// 	'active' => ['dashboard', 'dashboard*'],
+        // ],
         [
             'key' => 'bcl',
             'text' => '',
